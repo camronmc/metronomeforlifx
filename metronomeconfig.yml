@@ -18,6 +18,6 @@ lpb : 1
 #Colors that the lights could be, must have at least two colors
 colors :  [red, orange, green, blue, yellow, pink, purple, cyan]
 
-# see selector docs default is all
-selector: 
+# list of selectors for granular control of lights. see selector docs default is ['all']
+selectors: 
 

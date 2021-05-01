@@ -14,7 +14,7 @@ spotify_token = ""
 username = ""
 firstColor = "white"
 lpb = 1
-selector = "all"
+selectors = ["all"]
 scope = "user-read-currently-playing"
 # number of seconds between API hits - default 5
 spot_rate = 5
@@ -29,13 +29,10 @@ def main():
     client_secret = datadict["client_secret"]
     lifx_token = datadict["lifx_token"]
     username = datadict["spot_username"]
-    rawcolorslist = datadict["colors"]
+    colors = datadict["colors"]
     lpb = float(datadict["lpb"])
     brightness = datadict["lights_brightness"]
-    selector = datadict["selector"]
-
-    for num in range(0, len(rawcolorslist)):
-        colors.append(rawcolorslist[num].strip())
+    selectors = datadict["selectors"]
 
     spotify_authenticate()
 
@@ -43,9 +40,11 @@ def main():
     params = {
         "brightness": brightness,
     }
-    turn_on_results = requests.put('https://api.lifx.com/v1/lights/{}/state'.format(selector), params,
-                                   auth=(lifx_token, ''))
-    light_status(turn_on_results.json())
+
+    for selector in selectors:
+        turn_on_results = requests.put('https://api.lifx.com/v1/lights/{}/state'.format(selector), params,
+                                    auth=(lifx_token, ''))
+        light_status(turn_on_results.json())
 
     play_song()
 
@@ -88,8 +87,9 @@ def play_song():
         "power_on": "true",
         "persist": "true"
     }
-    pulse = requests.post('https://api.lifx.com/v1/lights/{}/effects/pulse'.format(selector), data, auth=(lifx_token, ''))
-    light_status(pulse.json())
+    for selector in selectors:
+        pulse = requests.post('https://api.lifx.com/v1/lights/{}/effects/pulse'.format(selector), data, auth=(lifx_token, ''))
+        light_status(pulse.json())
 
     # poll every `spot_rate` seconds because no web hook exists
     print("Checking for a change in song every {} seconds...".format(spot_rate))
@@ -115,8 +115,9 @@ def stop_lights(color):
     params = {
         "color": str(color),
     }
-    turn_on_results = requests.put('https://api.lifx.com/v1/lights/{}/state'.format(selector), params,
-                                   auth=(lifx_token, ''))
+    for selector in selectors:
+        turn_on_results = requests.put('https://api.lifx.com/v1/lights/{}/state'.format(selector), params,
+                                    auth=(lifx_token, ''))
 
 
 def light_status(js):
