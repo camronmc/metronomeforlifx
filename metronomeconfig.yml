@@ -18,6 +18,10 @@ lpb : 1
 #Colors that the lights could be, must have at least two colors
 colors :  [red, orange, green, blue, yellow, pink, purple, cyan]
 
-# list of selectors for granular control of lights. see selector docs default is ['all']
-selectors: 
+# see selector docs default is ['all']
+# if you want to span multiple groups but not all of you lights 
+# set a scene with the lights that you want with transition 0
+# get the scene id of this from https://api.developer.lifx.com/docs/list-scenes
+# and place that here. 
+selector: 
 
