@@ -28,9 +28,8 @@ def main():
     client_id = datadict["client_id"]
     client_secret = datadict["client_secret"]
     lifx_token = datadict["lifx_token"]
-    rawcolor = datadict["colors"]
     username = datadict["spot_username"]
-    rawcolorslist = rawcolor.split(",")
+    rawcolorslist = datadict["colors"]
     lpb = float(datadict["lpb"])
     brightness = datadict["lights_brightness"]
     selector = datadict["selector"]
@@ -182,8 +181,7 @@ def get_variables():
     with open(config_file, 'r') as file:
         dicti = yaml.safe_load(file)
     
-    print(dicti)
-    exit()
+    return dicti
 
 
 if __name__ == "__main__":
