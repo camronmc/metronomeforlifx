@@ -1,0 +1,23 @@
+#Enter Spotify details
+client_id : 
+client_secret : 
+spot_username : 
+API_rate : 
+
+#Enter LIFX token
+lifx_token : 
+
+#Settings
+#Brightness: 1.0 is 100% brightness, 0.5 is 50% brightness, etc.
+lights_brightness : 1.0
+
+#LPB (lights per beat): the number of light flashes that occur per beat;
+#a lpb value of 1 means 1 light flash per beat, 2 means 2 flashes per beat, etc.
+lpb : 1
+
+#Colors that the lights could be, must have at least two colors
+colors :  [red, orange, green, blue, yellow, pink, purple, cyan]
+
+# see selector docs default is all
+selector: 
+

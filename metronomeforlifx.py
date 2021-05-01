@@ -3,8 +3,9 @@ import requests
 import time as t
 import spotipy.util as util
 import random
+import yaml
 
-global spotify_token, client_id, client_secret, lifx_token, colors, username, lpb, firstColor
+global spotify_token, client_id, client_secret, lifx_token, colors, username, lpb, firstColor, spot_rate, config_file
 colors = []
 client_id = ""
 client_secret = ""
@@ -15,6 +16,10 @@ firstColor = "white"
 lpb = 1
 selector = "all"
 scope = "user-read-currently-playing"
+# number of seconds between API hits - default 5
+spot_rate = 5
+# custom config file to avoid committing secrets. 
+config_file = 'metronomeconfig.yml'
 
 
 def main():
@@ -28,6 +33,7 @@ def main():
     rawcolorslist = rawcolor.split(",")
     lpb = float(datadict["lpb"])
     brightness = datadict["lights_brightness"]
+    selector = datadict["selector"]
 
     for num in range(0, len(rawcolorslist)):
         colors.append(rawcolorslist[num].strip())
@@ -83,11 +89,11 @@ def play_song():
         "power_on": "true",
         "persist": "true"
     }
-    pulse = requests.post('https://api.lifx.com/v1/lights/all/effects/pulse', data, auth=(lifx_token, ''))
+    pulse = requests.post('https://api.lifx.com/v1/lights/{}/effects/pulse'.format(selector), data, auth=(lifx_token, ''))
     light_status(pulse.json())
 
-    # poll every 5 seconds because no web hook exists
-    print("Checking for a change in song every 5 seconds...")
+    # poll every `spot_rate` seconds because no web hook exists
+    print("Checking for a change in song every {} seconds...".format(spot_rate))
     print("Press CTRL-C to quit\n")
 
     while True:
@@ -96,7 +102,7 @@ def play_song():
                 play_song()
                 break
             else:
-                t.sleep(5.0)
+                t.sleep(spot_rate)
         except KeyboardInterrupt:
             print(' Stopped')
             stop_lights(firstColor)
@@ -154,6 +160,8 @@ def get_current_song():
     name = idandname[1]
     get_song = requests.get("https://api.spotify.com/v1/audio-analysis/{}".format(id), headers=header)
     song_info = get_song.json()
+    print("spotify returns")
+    print(song_info)
     tempo = song_info["track"]["tempo"]
     duration = song_info["track"]["duration"]
     return [tempo, duration, id, name]
@@ -171,17 +179,11 @@ def spotify_authenticate():
 
 def get_variables():
     dicti = {}
-    with open('metronomeconfig.txt', 'r') as file:
-        content = file.readlines()
-        for line in content:
-            if "=" in line:
-                v = line.split("=")
-                if len(v) == 2:
-                    dicti[v[0].strip()] = v[1].strip()
-                else:
-                    print("Please fill in your information on the metronomeconfig.txt file")
-                    exit()
-        return dicti
+    with open(config_file, 'r') as file:
+        dicti = yaml.safe_load(file)
+    
+    print(dicti)
+    exit()
 
 
 if __name__ == "__main__":
